@@ -1,0 +1,90 @@
+<%- include("./header.ejs") %>
+
+<div id="update">
+    <div class="left-container" id="left-container">
+        <a href="/mainpage"><div class="nav-bar">
+            <i class="fa-solid fa-house"></i><span>Home Page</span>
+        </div></a>
+        <a href="/bookmark"><div class="nav-bar">
+            <i class="fa-solid fa-star star-solid"></i><span>Bookmark</span>
+        </div></a>
+        <a href="http://localhost:3000/update"><div class="nav-bar">
+            <i class="fa-solid fa-upload"></i><span>Update</span>
+        </div></a>
+    </div>
+
+    <div class="right-container">
+        <div class="update-box">
+            <div class="update-item">
+                <h5>Update Impact Factor</h5>
+                <label for="images" class="drop-container">
+                    <span class="drop-title">Drop files here</span>
+                    <i class="fa-solid fa-file-excel"></i>
+                    or
+                </label>
+                <input type="file" id="upload-excel" accept=".xlsx" required>
+                <button class="upload-btn green-btn" onclick="uploadExcel()">Upload</button>
+                <span class="description">The sample for upload file can be downloaded below</span>
+                <a href="assets/data/Clarivate_IF_report_sample.xlsx" class="download-excel"><i class="fa-solid fa-download"></i> Clarivate_IF_report_sample.xlsx</a>
+                <span class="description">Please upload the excel by following the sample format</span>
+            </div>
+            <div class="update-item">
+                <h5>Upload customized journal</h5>
+                <button class="update-btn">
+                    <i class="fa-solid fa-book"></i>
+                    <h6>Click</h6>
+                </button>
+                <span class="description">Click to add a new customized journal feed</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
+
+<script>
+    var excel_file = document.getElementById('upload-excel');
+    var updated_excel = [];
+    excel_file.addEventListener('change', (event) => {
+        readXlsxFile(excel_file.files[0]).then(function(data){
+            var temp = [];
+            data.forEach(datas =>{
+                temp.push({
+                    "Journal name":datas[0],
+                    "JCR Abbreviation":datas[1],
+                    "ISSN":datas[2],
+                    "eISSN":datas[3],
+                    "Category":datas[4],
+                    "Total Citations":datas[5],
+                    "JIF":datas[6],
+                    "JIF Quartile":datas[7],
+                    "JCI":datas[8],
+                    "% of OA Gold":datas[9]
+                })
+            })
+            for(var i=0;i<10002;i++){
+                updated_excel[i] = temp[i];
+            }
+        })
+    });
+    function uploadExcel(){
+        if(updated_excel){
+            fetch('/update',{
+                method:'POST',
+                headers:{
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({updated_excel:updated_excel})
+                })
+                .then(res=>res.json())
+                .then(jsondata=>{
+                    console.log(jsondata);
+                })
+
+            location.href="/update";
+        }else{
+            location.href="/update";
+        }
+    }
+
+</script>

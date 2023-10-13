@@ -1,0 +1,106 @@
+<link rel="stylesheet" type="text/css" href="assets/css/user.css?v=2">
+<link rel="stylesheet" type="text/css" href="assets/css/header.css?v=2">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>User setting</title>
+    <div id="user">
+        <div class="container-box">
+                <div class="keyword-container" id="keyword-container">
+                    <div class="header">User Preferences</div>
+                    <div class="id-input">
+                        <div class="header2">Please provide your Google Scholar ID to receive recommended keywords:</div>
+                        <input type="text" placeholder="Input Here" id="id-input">
+                        <button class="submit-id" id="submit-id" name="name">Confirm</button>
+                        <span class="get-scholar-id" id="get-scholar-id">Get my Google Scholar ID</span>
+                    </div>
+                    <div id="profile" class="profile">
+                        <% if(result){%>
+                            <img src="<%-result[0]%>" class="profile_pic">
+                            <div class="profile_name"><%-result[1]%></div>
+                        <% }%>
+                    </div>
+                    <div>
+                        <div id="filter-text" class="filter-text row">
+                            <% if(result){%>
+                                <div class="header2">Recommended keywords</div>
+                                <%for(var i = 2; i <result.length; i++){%>
+                                    <div id="result<%-i%>" class="checkboxes display-keyword col-4"><input type="checkbox" id="checkbox<%-i%>"><%-result[i]%></div>
+                                <%}%>
+                            <% }%>
+                            <div class="header2">Input customized keywords</div>
+                            <input type="text" id="custom-keyword" class="custom-keyword">
+                            <div class="header3">Please enter your desired keywords in the space provided above, separating each keyword with a comma. For example: one, two, three</div>
+                                <button class="submit-keyword" id="submit-keyword" name="name">Submit</button>
+                            <!-- <input type="text" id="custom-keyword" class="custom-keyword">
+                            <button class="submit-keyword" id="submit-keyword" name="name">Submit</button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div id="myModal" class="modal">
+            <div class="modal-content1" id="modal-content1">
+                <div class="modal-close"><i class="fa-solid fa-xmark" id="modal-close"></i></div>
+                <div>Find your profile user ID</div>
+                <input type="text" placeholder="paste your Google Scholar profile URL here" id="modal-url">
+            </div>
+        </div>
+    </div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+<script type="text/javascript" src="assets/js/user.js"></script>
+<script>
+    
+    var submit_keyword = document.getElementById("submit-keyword");
+    var display_keyword = document.getElementsByClassName("display-keyword");
+    var custom_keyword = document.getElementById("custom-keyword");
+    var keyword = [];
+    var checkboxes = [];
+    for(var i=0;i<display_keyword.length;i++) {
+        keyword[i] = document.getElementById("result"+ (i + 2));
+        checkboxes[i] = document.getElementById("checkbox"+(i + 2));
+    }
+    submit_keyword.onclick = function() {
+        var saved_keywords = [];
+        var index = 0;
+        for (var i = 0; i <checkboxes.length; i++) {
+            if(checkboxes[i].checked == true){
+                saved_keywords[index] = [keyword[i].innerText,1];
+                index++; 
+            }
+        }
+        var custom_keyword2 = custom_keyword.value.split(',');
+        if(!saved_keywords[0] && custom_keyword2[0] == ""){
+            let header3 = document.getElementsByClassName("header3");
+            header3[0].innerHTML = "Input your customized keywords above, separate each keyword by ',', i.e. one, two, three <div class='error-message'>Please input at least one keyword</div>";
+        }else{
+            var profile = [];
+            var profile_pic = document.getElementsByClassName("profile_pic").src;
+            var profile_name = document.getElementsByClassName("profile_name").innerText;
+            if(profile_pic || profile_name){
+                profile.push(profile_pic);
+                profile.push(profile_name);
+            }
+            for(var i=0;i<custom_keyword2.length; i++){
+            //custom_keyword2[i] = custom_keyword2[i].replace(/\s+/g, '');
+            saved_keywords.push([custom_keyword2[i],1]);
+            index++;
+            }
+            fetch('/user-setting',{
+                method:'POST',
+                headers:{
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({saved_keywords:saved_keywords, profile:profile})
+                })
+                .then(res=>res.json())
+                .then(jsondata=>{
+                    console.log(jsondata);
+                })
+                setTimeout(function() {
+                    location.href = "/mainpage";
+                }, 200);
+                
+        }
+    }
+
+</script>

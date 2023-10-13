@@ -1,0 +1,108 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="/static/index.css"> 
+    </head>
+
+    <body>
+        <form class="grid" action="/result" method="POST">
+            <h1>Keywords Extraction</h1>
+            <h3>Input:</h3>
+            <textarea type="text" id="paper" name="paper" class="paper"></textarea>
+            {% if kw1 %}
+            <h3>Output:</h3>
+            <table>
+                <tr>
+                    <th>Keywords</th>
+                    <th>Score</th>
+                </tr>
+                <tr>
+                    <td>{{kw1}}</td>
+                    <td>{{sc1}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw2}}</td>
+                    <td>{{sc2}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw3}}</td>
+                    <td>{{sc3}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw4}}</td>
+                    <td>{{sc4}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw5}}</td>
+                    <td>{{sc5}}</td>
+                </tr>
+        <tr>
+                    <td>{{kw6}}</td>
+                    <td>{{sc6}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw7}}</td>
+                    <td>{{sc7}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw8}}</td>
+                    <td>{{sc8}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw9}}</td>
+                    <td>{{sc9}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw10}}</td>
+                    <td>{{sc10}}</td>
+                </tr>
+        <tr>
+                    <td>{{kw11}}</td>
+                    <td>{{sc11}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw12}}</td>
+                    <td>{{sc12}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw13}}</td>
+                    <td>{{sc13}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw14}}</td>
+                    <td>{{sc14}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw15}}</td>
+                    <td>{{sc15}}</td>
+                </tr>
+        <tr>
+                    <td>{{kw16}}</td>
+                    <td>{{sc16}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw17}}</td>
+                    <td>{{sc17}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw18}}</td>
+                    <td>{{sc18}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw19}}</td>
+                    <td>{{sc19}}</td>
+                </tr>
+                <tr>
+                    <td>{{kw20}}</td>
+                    <td>{{sc20}}</td>
+                </tr>
+            </table>
+
+            {% endif %}
+           
+
+            <input class="file_submit" type="Submit">
+        </form>
+    </body>
+</html>

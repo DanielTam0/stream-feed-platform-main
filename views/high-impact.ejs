@@ -1,0 +1,56 @@
+<%- include("./header.ejs") %>
+
+<!-- <div id="high-impact">
+    <div class="back"><a href="/mainpage"><i class="fa-solid fa-arrow-left"></i> back to Main Page</a></div>
+    <div class="header">High Impact Journals</div>
+    <div class="high-impact-container">
+        <div class="rank-row">
+            <% for(var i = 0; i<ranking.length; i++) { %>
+                <div class="rank-box">
+                    <div class="rank">Rank <%-ranking[i].rank%></div>
+                    <img src="<%-ranking[i].img%>" class="logo">
+                    <div class="logo-name"><%-ranking[i].title%></div>
+                    <div>H-Index: <span class="h-index"><%- ranking[i].hIndex%></span></div>
+                </div>
+            <% } %> 
+        </div>
+        <div class="journal-row">
+            <%  for(var i = 0; i<high_impact_feeds.length; i++) { 
+                    if(high_impact_feeds[i].creator.length > 120) {
+                        high_impact_feeds[i].creator = high_impact_feeds[i].creator.substring(0,120) + "...";
+                        var last_space = high_impact_feeds[i].creator.lastIndexOf(',');
+                        high_impact_feeds[i].creator = high_impact_feeds[i].creator.substring(0,last_space) + "...";
+                    }
+                    var now = new Date();
+                    var upload_time = Math.abs(Math.abs(now - high_impact_feeds[i].isoDate));
+                    if(upload_time>86400000){
+                        upload_time = Math.floor(upload_time/86400000) + " day(s) ago";
+                    }else if(upload_time>3600000){
+                        upload_time = Math.floor(upload_time/3600000) + " hour(s) ago";
+                    }else if(upload_time>60000){
+                        upload_time = Math.floor(upload_time/60000) + " minute(s) ago";
+                    }else if(upload_time>1000){
+                        upload_time = Math.floor(upload_time/1000) + " second(s) ago";
+                    }else{
+                        upload_time = "Now";
+                    }
+            %>
+            <a href="<%-high_impact_feeds[i].link%>" target="_blank">
+                <div class="item">
+
+                    <div><img src="<%-high_impact_feeds[i].img%>" class="item-img"></div>
+                    <div class="item-detail">
+                        <div class="item-title"><%-high_impact_feeds[i].title%></div>
+                        <div class="item-author"><%-high_impact_feeds[i].org%> / <%-high_impact_feeds[i].creator%> / <%-upload_time%></div>
+                        <div class="item-content"><%-high_impact_feeds[i].contentSnippet%></div>
+                    </div>
+                    
+                </div>
+            </a>
+            <% } %> 
+        </div>
+    </div>
+</div> -->
+<script>
+
+</script>

@@ -1,0 +1,203 @@
+:root{
+    --red-violet: #bf165e;
+    --light-red: #e13a83;
+    --white:#ffffff;
+    --greyish-blue: #4338ca;
+    --sidebar-font:#a5b4fc;
+    --light-blue:#6495ed;
+    --pale-blue: #d1e1fd;
+    --blue:#2369ea;
+    --steelblue: #312e81;
+    --black:#000000;
+    --pale-purple: #a789db;
+    --light-grey:#eaeaea;
+    --grey:#808080;
+    --dark-grey:#555555;
+    --green:#25d366;
+    --light-green:#ecf5ec;
+    --excel-green:#008000;
+    --dark-green:#006b00;
+    --orange: #ffc107;
+}
+#update{
+    width: 100%;
+    height: calc(100% - 50px);
+    overflow: auto;
+    display: inline-flex;
+}
+#update a{
+    color:inherit;
+    text-decoration:none;
+}
+#update .left-container{
+    display:inline-block;
+    background-color: var(--steelblue);
+    color: var(--sidebar-font);
+    width: 230px;
+    height:100%;
+    overflow: auto;
+}
+#update .left-container .search .fa-magnifying-glass{
+    line-height: 20px;
+    width: 18px;
+    cursor: pointer;
+}
+#update .left-container .search .fa-magnifying-glass:hover{
+    color:var(--white);
+}
+#update .left-container .nav-bar{
+    width: 95%;
+    padding: 10px 0 10px 20px;
+    transition: all 0.25s;
+    margin: 5px auto 0 auto;
+}
+#update .left-container .nav-bar:hover{
+    color: var(--white);
+    cursor: pointer;
+    background-color: var(--greyish-blue);
+    border-radius:8px;
+}
+#update .left-container .nav-bar .fa-rss{
+    margin:0 4px 0 1px;
+}
+#update .left-container .nav-bar .fa-upload{
+    width:18px;
+}
+#update .left-container .nav-bar span{
+    margin-left:8%;
+}
+#update .right-container{
+    width: calc(100% - 230px);
+    height: 100%;
+    overflow: auto;
+    background-color: var(--light-grey);
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 30px 20px;
+    align-content: center;
+}
+#update .right-container .update-box{
+    width: 800px;
+    height: 450px;
+    background-color: var(--white);
+    border-radius: 10px;
+    display: inline-flex;
+    justify-content: space-around;
+    align-items: center;
+}
+#update .right-container .update-box .update-item{
+    width: 50%;
+    height: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+#update .right-container .update-box .update-item:nth-child(1){
+    border-right:1px solid var(--black);
+}
+#update .right-container .update-box .update-item h5{
+    padding:10px 0;
+}
+#update .right-container .update-box .update-item .drop-container {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 135px;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--excel-green);
+    color: var(--excel-green);
+    cursor: pointer;
+    transition: background .3s ease-in-out, border .3s ease-in-out;
+    width: 240px;
+    margin-bottom: 15px;
+}
+#update .right-container .update-box .update-item .drop-container:hover {
+    background-color: var(--light-green);
+
+}
+#update .right-container .update-box .update-item .drop-container:hover #update .right-container .update-box .update-item .drop-title {
+
+}
+#update .right-container .update-box .update-item .drop-title{
+    color: var(--dark-grey);
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    transition: color .2s ease-in-out;
+}
+#update .right-container .update-box .update-item .fa-file-excel{
+    font-size: 50px;
+}
+#update .right-container .update-box .update-item input[type=file] {
+    width: 300px;
+    max-width: 100%;
+    color: var(--black);
+    padding: 5px;
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid var(--dark-grey);
+    font-size: 13px;
+}
+#update .right-container .update-box .update-item input[type=file]::file-selector-button {
+    margin-right: 10px;
+    border: none;
+    background: var(--excel-green);
+    padding: 3px 6px;
+    border-radius: 10px;
+    color: var(--white);
+    cursor: pointer;
+    transition: background .2s ease-in-out;
+}
+#update .right-container .update-box .update-item input[type=file]::file-selector-button:hover {
+    background: var(--dark-green);
+}
+#update .right-container .update-box .update-item .upload-btn{
+    margin-top: 10px;
+    border-radius: 10px;
+    color: var(--white);
+    padding: 1px 10px;
+}
+#update .right-container .update-box .update-item .green-btn{
+    background-color: var(--excel-green);
+    border: 1px solid var(--excel-green);
+}
+#update .right-container .update-box .update-item .green-btn:active{
+    background-color: var(--dark-green);
+}
+#update .right-container .update-box .update-item .blue-btn{
+    background-color: var(--blue);
+    border: 1px solid var(--blue);
+}
+#update .right-container .update-box .update-item .description{
+    padding: 10px;
+    text-align: center;
+}
+#update .right-container .update-box .update-item .download-excel{
+    color:var(--excel-green);
+    text-decoration: underline;
+}
+#update .right-container .update-box .update-item .download-excel:hover{
+    color:var(--dark-green);
+    text-decoration: none;
+}
+#update .right-container .update-box .update-item .update-btn{
+    width: 240px;
+    height: 240px;
+    border: 1px solid var(--blue);
+    border-radius: 10px;
+    background-color: var(--white);
+    color: var(--blue);
+    font-size: 50px;
+    transition: background .3s ease-in-out, border .3s ease-in-out;
+}
+#update .right-container .update-box .update-item .update-btn:hover{
+    background-color:var(--pale-blue);
+}
+#update .right-container .update-box .update-item .update-btn .fa-book{
+    
+}

@@ -1,0 +1,128 @@
+<%- include("./header.ejs") %>
+
+<div id="bookmark-page">
+
+    <div class="left-container" id="left-container">
+        <div class="search">
+            <i class="fa-solid fa-bars"></i>
+                <input type="text" placeholder="Search.." class="search-bar" id="search-bar">
+            <i class="fa-solid fa-magnifying-glass" onclick="searchFeeds()"></i>
+        </div>
+        <a href="/mainpage"><div class="nav-bar">
+            <i class="fa-solid fa-house"></i><span>Home Page</span>
+        </div></a>
+        <a href="/bookmark"><div class="nav-bar">
+            <i class="fa-solid fa-star star-solid"></i><span>Bookmark</span>
+        </div></a>
+        <a href="http://localhost:3000/update"><div class="nav-bar">
+            <i class="fa-solid fa-upload"></i><span>Update</span>
+        </div></a>
+    </div>
+
+
+    <div class="right-container">
+        <div class="sort-method">Sorted by: 
+            <select class="sort-option" onChange="sorting()" id="sort-option">
+                <option value="">Select...</option>
+                <option value="sort-op1">Default</option>
+                <option value="sort-op2">Publish Date (old to new)</option>
+                <option value="sort-op3">Publish Date (new to old)</option>
+            </select>
+        
+        </div>
+        <%
+            for(var i=0;i<bookmark_info.length;i++){
+        %>
+            <div class="box-container">
+                <div class="box-publisher"><%=bookmark_info[i].publisher%></div>
+                <a href="<%=bookmark_info[i].url%>" target="_blank">
+                    <div class="box-title"><%=bookmark_info[i].title%></div>
+                    <div class="box-author">author(s): <%=bookmark_info[i].author%></div>
+                    <div class="box-pub-date">Time: <%=new Date(bookmark_info[i].publish_date).toString().substring(0,24)%></div>
+                    <div class="box-abstract"><%=bookmark_info[i].abstract%></div>
+                </a>
+                <div class="remove-row"><button class="remove-btn" onclick='removeBookmark("<%=i%>");'><i class="fa-solid fa-trash-can"></i> Remove</button></div>
+            </div>
+        <%
+            }
+        %>
+
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content1" id="modal-content1">
+            <div class="modal-close"><i class="fa-solid fa-xmark" id="modal-close"></i></div>
+            <div id="modal-confirm">
+
+            </div>
+
+        </div>
+    </div>
+</div> 
+
+
+<script>
+var bookmark_info = <%- JSON.stringify(bookmark_info) %>;
+var sort_method = localStorage.getItem("sort-method");
+if(!sort_method){
+    localStorage.setItem("sort-method","sort-op1");
+}
+function removeBookmark(item_no){
+    var modal = document.getElementById("myModal");
+    var modal_content = document.getElementById("modal-content1");
+    var modal_confirm = document.getElementById("modal-confirm");
+    var modal_close = document.getElementById("modal-close");
+
+
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal_close.onclick = function() {
+        modal.style.display = "none";
+    }
+    modal_confirm.innerHTML = "<div class='modal-content2'>Are you sure you want to remove this item?</div><div class='modal-content2'>"+bookmark_info[item_no].title+"</div><div class='confirm-row'><button class='no-btn' onClick='closeModal()'>No</button><button class='yes-btn' onClick='deleteItem("+item_no+")'>Yes</button></div>";
+
+}
+function deleteItem(item_no){
+        fetch('/bookmark',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({"remove_bookmark":bookmark_info[item_no]})
+            })
+            .then(res=>res.json())
+            .then(data=>console.log(data));
+    
+        location.href = "/bookmark";
+}
+function closeModal() {
+    var modal = document.getElementById("myModal");
+    modal.style.display = "none";
+}
+function searchFeeds(){
+    var search_string = document.getElementById("search-bar").value;
+    var box_container = document.getElementsByClassName("box-container");
+    if(search_string){
+        for(var i=0;i<bookmark_info.length;i++){
+            if(bookmark_info[i].publisher.indexOf(search_string)>0 || bookmark_info[i].title.indexOf(search_string)>0 || bookmark_info[i].author.indexOf(search_string)>0 || bookmark_info[i].abstract.indexOf(search_string)>0){
+                box_container[i].style.display = "inline-flex";
+            }else{
+                box_container[i].style.display = "none";
+            }
+        }
+    }else{
+        for(var i=0;i<bookmark_info.length;i++){
+            box_container[i].style.display = "inline-flex";
+        }
+    }
+}
+function sorting(){
+
+    var select = document.getElementById('sort-option');
+	var sort_option = select.options[select.selectedIndex].value;
+    localStorage.setItem("sort-method",sort_option);
+    sort_option = localStorage.getItem("sort-method");
+    location.href = "/bookmark?sort=" + sort_option;
+}
+</script>

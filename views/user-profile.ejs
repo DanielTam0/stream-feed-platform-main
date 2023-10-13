@@ -1,0 +1,156 @@
+<%- include("./header.ejs") %>
+<div id="user-profile">
+    <div class="profile-container">
+        <div class="profile-box">
+            <div class="left-container">
+                <div class="header">Profile</div>
+                <%if(user_profile){%>
+                    <div ><img src="<%=user_profile.user_img%>" class="profile_img"></div>
+                    <div class="profile_username"><%=user_profile.username%></div>
+                <%}else{%>
+                    <div ><img src="assets/images/guest_profile_img.png" class="profile_img"></div>
+                    <div class="profile_username">Guest</div>
+                <%}%>
+            </div>
+            <div class="right-container">
+                <div class="header">Keywords</div>
+                <div class="weight-row">
+                    <div style="display: none;">Relative Weighting: <input type="number" step="0.1" max="1" min="0.1" class="weighting" value="<%-weighting.relative_weight%>" id="relat-weight"></div>
+                    <div style="display: none;">Impact Factor Weighting: <input type="number" step="0.1" max="1" min="0.1" class="weighting" value="<%-weighting.impact_weight%>" id="impact-weight"></div>
+                </div>
+                <div class="keyword-pool">
+                    <%for(var i = 0;i<saved_keywords.length;i++){%>
+                        <div class="keyword" id="<%-saved_keywords[i][0]%>"><input type="text" value="<%-saved_keywords[i][1]%>" class="keyword-weight"><%-saved_keywords[i][0]%>
+                            <i class="fa-solid fa-xmark remove-btn" onclick="removeKeyword('<%-saved_keywords[i][0]%>')"></i></div>
+                    <%}%>
+                </div>
+                <div class="show-remove" id="show-remove"></div>
+                <div>
+                    <input type="text" class="add-keyword" id="add-keyword" placeholder="Input your customized keywords here"></input>
+                </div>
+                <div><button class="confirm-btn" onclick="saveChanges()">Confirm</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var saved_keywords = <%- JSON.stringify(saved_keywords) %>;
+    var remove_key_list = [];
+    var repeat = false;
+    var customized_index = 0;
+    var show_remove = document.getElementById("show-remove");
+    function removeKeyword(remove_keyword){
+        for(var i=0;i<remove_key_list.length;i++){
+            if(remove_keyword == remove_key_list[i]){
+                repeat = true;
+            }
+        }
+        if(!repeat){
+            remove_key_list.push(remove_keyword);
+            var temp_remove = document.getElementById(remove_keyword);
+            temp_remove.style.display = "none";
+            show_remove.innerHTML += "<div class='removed-keyword' id='remove-"+remove_keyword+"' onclick=recoverKeyword('"+remove_keyword+"')>"+remove_keyword+"<i class='fa-solid fa-rotate-left'></i></div>" 
+        }
+        repeat=false;
+    }
+    function recoverKeyword(recover_keyword){
+        for(var i = 0;i<saved_keywords.length;i++){
+
+            if(recover_keyword == remove_key_list[i]){
+                console.log(remove_key_list[i].length);
+                remove_key_list.splice(i,1);
+                var temp_recover = document.getElementById("remove-"+recover_keyword);
+                temp_recover.style.display = "none";
+                var temp_remove = document.getElementById(recover_keyword);
+                temp_remove.style.display = "block";
+                break;
+            }
+        }
+    }
+    function saveChanges(){
+        var new_keyword = [];
+        var remove_index = [];
+        var add_keyword = document.getElementById("add-keyword").value.split(',');
+        var relat_weight = parseFloat(document.getElementById("relat-weight").value);
+        var impact_weight = parseFloat(document.getElementById("impact-weight").value);
+
+        for(var i=0;i<saved_keywords.length;i++){
+            var current_weight = document.getElementById(saved_keywords[i][0]).firstChild.value;
+            saved_keywords[i][1] = current_weight;
+        }
+        if(add_keyword != ""){
+            for(var i=0;i<add_keyword.length; i++){
+                //add_keyword[i] = add_keyword[i].replace(/\s+/g, '');
+                new_keyword.push(add_keyword[i]);
+            }
+        }
+        for(var i=0;i<saved_keywords.length;i++){
+            for(var j=0;j<remove_key_list.length;j++){
+                if(saved_keywords[i][0]==remove_key_list[j] || saved_keywords[i][0]==""){
+                    remove_index.push(i);
+                    break;
+                }
+            }
+        }
+        for(var i of remove_index.reverse()){
+            saved_keywords.splice(i, 1);
+        }
+        for(var i = 0;i<new_keyword.length;i++){
+            saved_keywords.push([new_keyword[i],1]);
+        }
+        if(!relat_weight){
+            relat_weight = 0.5;
+        }
+        if(!impact_weight){
+            impact_weight = 0.5;
+        }
+        
+        var weighting = {relative_weight:relat_weight,impact_weight:impact_weight};
+        console.log(weighting);
+        saved_keywords = [...new Set(saved_keywords)];
+        fetch('/user-profile',{
+                method:'POST',
+                headers:{
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({saved_keywords:saved_keywords,weighting:weighting})
+                })
+                .then(res=>res.json())
+                .then(jsondata=>{
+                    console.log(jsondata);
+                })
+        
+        setTimeout(function() {
+            location.href = "/user-profile";
+        }, 200);
+    }
+    for(var i=0;i<saved_keywords.length;i++){
+            var key_weighting = document.getElementById(saved_keywords[i][0]).firstChild;
+            key_weighting.addEventListener("change",e=>{
+                e.currentTarget.value = parseInt(e.currentTarget.value);
+                if(e.currentTarget.value<1){
+                    e.currentTarget.value = 1;
+                }else if(e.currentTarget.value>10){
+                    e.currentTarget.value = 10;
+                }
+            })
+    }
+    var relat_weight_val = document.getElementById("relat-weight");
+    var impact_weight_val = document.getElementById("impact-weight");
+    relat_weight_val.addEventListener("change",e=>{
+        e.currentTarget.value = parseFloat(e.currentTarget.value).toFixed(1);
+        if(e.currentTarget.value<0){
+            e.currentTarget.value = 0;
+        }else if(e.currentTarget.value>1){
+            e.currentTarget.value = 1;
+        }
+    })
+    impact_weight_val.addEventListener("change",e=>{
+        e.currentTarget.value = parseFloat(e.currentTarget.value).toFixed(1);
+        if(e.currentTarget.value<0){
+            e.currentTarget.value = 0;
+        }else if(e.currentTarget.value>1){
+            e.currentTarget.value = 1;
+        }
+    })
+</script>
