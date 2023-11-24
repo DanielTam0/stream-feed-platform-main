@@ -19,14 +19,14 @@ var tfidf = new TfIdf();
 function outputJournal(org_no,list_no){
     var repeat = false;
     var temp_list_no = [org_no,list_no]; 
-    function arrayEquals(a, b) {
-        return Array.isArray(a) &&
-            Array.isArray(b) &&
-            a.length === b.length &&
-            a.every((val, index) => val === b[index]);
-    }
+function arrayEquals(a, b) {
+    return Array.isArray(a) &&
+        Array.isArray(b) &&
+        a.length === b.length &&
+        a.every((val, index) => val === b[index]);
+}
 
-    Array.prototype.remove = function() {
+Array.prototype.remove = function() {
         var what, a = arguments, L = a.length, ax;
         while (L && this.length) {
             what = a[--L];
@@ -50,7 +50,7 @@ function outputJournal(org_no,list_no){
     repeat = false;
 
     return store_list_no;
-    
+
 }
 const outputNewFeed = async(store_list_no,saved_keywords,weighting) => {
     var request = require('request');
@@ -82,7 +82,7 @@ const outputNewFeed = async(store_list_no,saved_keywords,weighting) => {
                     if(!err){
                     feed.items.forEach((item) => {
                         if(Math.abs(today - new Date(item.isoDate))<2629800000){
-                            
+
                             item.pubImg = org[options.qs.org_no][0];
                             item.listName = list[options.qs.org_no][options.qs.list_no][0];
                             if(feed.title.includes("Nature") || feed.title.includes("Light: Science") ){
@@ -124,7 +124,7 @@ const outputNewFeed = async(store_list_no,saved_keywords,weighting) => {
                     item.content = item['content:encoded'];
                     item.contentSnippet = item['content:encoded'];
                     item.contentSnippet = item.contentSnippet.split('<h2>Abstract</h2>')[1];
-                    
+
                 }
                 feed_article.push(item);
             }
@@ -135,7 +135,7 @@ const outputNewFeed = async(store_list_no,saved_keywords,weighting) => {
         let temp_feed = [];
         let results = await Promise.all(promises);
         results.forEach(function(result) {
-          temp_feed.push(result);
+            temp_feed.push(result);
         });
         return temp_feed;
     }
@@ -144,16 +144,16 @@ const outputNewFeed = async(store_list_no,saved_keywords,weighting) => {
     })
     var request_rss = await request_result;
     if(request_rss[0]){
-        
+
         for(var i = 0; i < request_rss.length; i++){
-            
+
             for(let j = 0; j < request_rss[i].items.length; j++){
-                
+
                 feed_article.push(request_rss[i].items[j]);
             }
         }
     }
-    
+
     TFIDF.addTFIDFDocument(feed_article,saved_keywords);
     for(var i = 0; i < feed_article.length; i++){
         related_rate[i] = 0;
@@ -174,21 +174,21 @@ const outputNewFeed = async(store_list_no,saved_keywords,weighting) => {
                 feed_article[i].listName = feed_article[i-1].listName;
                 feed_article[i].pubImg = feed_article[i-1].pubImg;
             }
-            if(feed_article[i].issn == JIF_info[j].ISSN || stringSimilarity.compareTwoStrings(feed_article[i].listName.toLowerCase(),JIF_info[j].journalName.toLowerCase()) >= 0.85){
+if(feed_article[i].issn == JIF_info[j].ISSN || stringSimilarity.compareTwoStrings(feed_article[i].listName.toLowerCase(),JIF_info[j].journalName.toLowerCase()) >= 0.85){
                 feed_article[i].impactFactorScore = JIF_info[j].JIF;
                 feed_article[i].normalizedIFScore = JIFindex.JIFScore(JIF_info[j]);
-                
+
                 break;
             }
         }
-        
+
         if(!feed_article[i].impactFactorScore || !feed_article[i].normalizedIFScore){
             feed_article[i].impactFactorScore = "N/A";
             feed_article[i].normalizedIFScore = 1;
         }
 
 
-        
+
     }
     //max & min relative score 
     var max_related_rate = Math.max(...related_rate);
@@ -220,14 +220,14 @@ const outputNewFeed = async(store_list_no,saved_keywords,weighting) => {
         related_rate[i] = temp_list[i].related_rate;
         feed_article[i].related_rate = related_rate[i];
         feed_article[i].totalScore = temp_list[i].total_score;
-        
+
         // var temp_uni_key = [...new Set(feed_article[i].keyword)];
         // feed_article[i].keyword = temp_uni_key.join(', ');
     }
     //const fs = require('fs');
-    
+
     // const jsonData = JSON.stringify(feed_article, null, 2);
-    
+
     // fs.writeFile('data.json', jsonData, (err) => {
     //   if (err) throw err;
     //   console.log('Data written to file');

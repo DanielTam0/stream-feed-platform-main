@@ -19,6 +19,8 @@ function orgList(){
 
     return list_of_org;
 }
+
+
 function rssList(){
     var org_size = orgList().length;
     var list_of_rss = []; // [name,url]

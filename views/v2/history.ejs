@@ -1,0 +1,208 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="assets/css/mainpage.css?v=2">
+    <link rel="stylesheet" type="text/css" href="assets/css/header.css?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Stream Feed Platform</title>
+</head>
+
+<body>
+    <%- include("../header.ejs") %>
+        <div id="mainpage">
+            <div class="main-container row">
+                <div class="left-container col-xl-2 col-md-3 col-4" id="left-container">
+                    <div class="search">
+                        <i class="fa-solid fa-bars"></i>
+                        <input type="text" placeholder="Search.." class="search-bar" id="search-bar">
+                        <i class="fa-solid fa-magnifying-glass" onclick="searchFeeds()"></i>
+                    </div>
+                    <a href="http://localhost:3000/v2/mainpage">
+                        <div class="nav-bar">
+                            <i class="fa-solid fa-house"></i><span>Home Page</span>
+                        </div>
+                    </a>
+                    <a href="http://localhost:3000/v2/bookmark">
+                        <div class="nav-bar">
+                            <i class="fa-solid fa-star star-solid"></i><span>Bookmark</span>
+                        </div>
+                    </a>
+                    <a href="http://localhost:3000/update">
+                        <div class="nav-bar">
+                            <i class="fa-solid fa-upload"></i><span>Update</span>
+                        </div>
+                    </a>
+                    <a href="http://localhost:3000/v2/history">
+                        <div class="nav-bar">
+                            <i class="fa-solid fa-clock"></i><span> History</span>
+                        </div>
+                    </a>
+                    <div class="nav-bar rss-expand">
+                        <i class="fa-solid fa-rss"></i><span>Feeds</span>
+                    </div>
+                    <div class="nav-bar-secondary" onclick="allFeeds()">
+                        <i class="fa-solid fa-folder"></i><span>All Articles</span>
+                    </div>
+                    <div class="nav-bar-secondary" id="add-new-feed">
+                        <i class="fa-solid fa-plus"></i><span>Add New</span>
+                    </div>
+                </div>
+
+                <div class="right-container col-xl-10 col-md-9 col-8">
+                    <div class="article-container" id="article-container">
+                        <div id="section-one"></div>
+                    </div>  
+                </div>
+            </div>
+
+            <button id="to-top" class="to-top" onclick="topFunction()"><i class="fa-solid fa-arrow-up"></i></button>
+
+            <div id="journal-modal" class="modal" style="display: none;">
+                <div class="journal-modal-content">
+                    <div class='modal-content'>
+                        <div id='modal-content'>
+                            <div class="modal-header-nf">
+                                <i class="fa-solid fa-xmark" id="close-journal-modal"></i>
+                            </div>
+                            <div class='modal-item'>
+                                <span id='modal-item-title'></span>
+                            </div>
+                            <div class='modal-item'>Author :
+                                <span id='modal-item-author'></span>
+                            </div>
+                            <div class='modal-item'>Publish Date : 
+                                <span id='modal-item-pubdate'></span>
+                            </div>
+                            <div class='modal-item'>URL : 
+                                <span id='modal-item-url'></span>
+                            </div>
+                            <div class='modal-item'>Related keyword(s) : 
+                                <span id='modal-item-keyword'></span>
+                            </div>
+                            <div class='modal-item'>Abstract :</div>
+                            <div class='modal-item'>
+                                <span id='modal-item-content'></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+        <script>
+            function showJournalDetail(id) {
+                $.ajax({
+                    url: "http://localhost:3000/v2/mainpage/journal/" + id,
+                    type: "GET",
+                    success: function (feed) {
+                        $("#modal-item-title").text(feed.title);
+                        $("#modal-item-author").html(feed.author);
+                        $("#modal-item-pubdate").text(new Date(feed.date).toLocaleString());
+                        $("#modal-item-url").html(`<a href="${feed.reference}" target="_blank">${feed.reference}`);
+                        $("#modal-item-keyword").text(feed.keywords);
+                        $("#modal-item-content").html(feed.content);
+                        $("#journal-modal").css("display", "block");
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                    }
+                }) 
+            }
+
+            function getJournals() {
+                $("#section-one").empty();
+                let sortCriteria = $("#sort-option").val();
+
+                $.ajax({
+                    url: "http://localhost:3000/v2/mainpage/journals?type=history",
+                    type: "GET",
+                    success: function (journals) {
+                        Object.entries(journals).forEach(([id, journal]) => {
+                            const postItem = document.createElement('div');
+                            postItem.classList.add('post-item');
+
+                            const postTitle = document.createElement('div');
+                            postTitle.classList.add('post-title');
+                            postTitle.textContent = journal.title;
+                            postItem.appendChild(postTitle);
+
+                            const postOrgList = document.createElement('div');
+                            postOrgList.classList.add('post-org-list');
+                            postItem.appendChild(postOrgList);
+
+                            const postImg = document.createElement('img');
+                            postImg.classList.add('post-img');
+                            postImg.src = journal.endpoint.organizer.image;
+                            postOrgList.appendChild(postImg);
+
+                            const postOrgName = document.createTextNode(journal.endpoint.organizer.name);
+                            postOrgList.appendChild(postOrgName);
+
+                            const relativeScore = document.createElement('div');
+                            relativeScore.classList.add('post-rate');
+                            relativeScore.textContent = `Relative Score: ${journal.relativeScore}`;
+                            postItem.appendChild(relativeScore);
+
+                            const impactFactorScore = document.createElement('div');
+                            impactFactorScore.classList.add('post-rate');
+                            impactFactorScore.textContent = `IF Score: ${journal.impactFactorScore} (Impact Factor: ${journal.impactFactor})`;
+                            postItem.appendChild(impactFactorScore);
+
+                            const totalScore = document.createElement('div');
+                            totalScore.classList.add('post-rate');
+                            totalScore.textContent = `Total Score: ${journal.totalScore}`;
+                            postItem.appendChild(totalScore);
+
+                            const postUploadTime = document.createElement('div');
+                            postUploadTime.classList.add('post-upload-time');
+                            postUploadTime.textContent = new Date(journal.date).toLocaleString();
+                            postItem.appendChild(postUploadTime);
+
+                            const postAbstract = document.createElement('div');
+                            postAbstract.classList.add('post-abstract');
+                            postItem.appendChild(postAbstract);
+
+                            const postAbstractSpan = document.createElement('span');
+                            postAbstractSpan.innerHTML = journal.content;
+                            postAbstract.appendChild(postAbstractSpan);
+
+                            const readMore = document.createElement('div');
+                            readMore.classList.add('read-more');
+                            postItem.appendChild(readMore);
+
+                            const readMoreBtn = document.createElement('button');
+                            readMoreBtn.classList.add('read-more-btn');
+                            readMoreBtn.textContent = 'Read More';
+                            readMoreBtn.onclick = function() {
+                                showJournalDetail(id);
+                            };
+                            readMore.appendChild(readMoreBtn);
+
+                            $("#section-one").append(postItem);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            $().ready(() => {
+                $("#close-journal-modal").click(function () {
+                    $("#journal-modal").css("display", "none");
+                });
+
+                getJournals();
+            })
+
+        </script>
+</body>
+
+</html>

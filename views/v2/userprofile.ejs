@@ -1,0 +1,171 @@
+<%- include("../header.ejs") %>
+<div id="user-profile">
+    <div class="profile-container">
+        <div class="profile-box">
+            <div class="left-container">
+                <div class="header">Profile</div>
+                <%if(userImage) {%>
+                    <div><img src="<%=userImage%>" class="profile_img"></div>
+                <%} else {%>
+                    <div><img src="assets/images/guest_profile_img.png" class="profile_img"></div>
+                <%}%>
+                <%if(userName) {%>
+                    <div class="profile_username"> <%=userName%> </div>
+                <%} else {%>
+                    <div class="profile_username">Guest</div>
+                <%}%>
+            </div>
+            <div class="right-container">
+                <div class="header">Keywords</div>
+                <div class="keyword-pool" id="keyword-pool"></div>
+                <div class="show-remove" id="show-remove"></div>
+                <div>
+                    <input type="text" class="add-keyword" id="add-keywords"
+                        placeholder="Input your customized keywords here"></input>
+                    <button class="confirm-btn" onclick="addKeywords()">Add keywords</button>
+                </div>
+                <div class="header">Scans profile</div>
+                <div>
+                    <input type="text" class="add-keyword" id="userId"
+                        placeholder="Input your google scholar userId" value="bISnneUAAAAJ"></input>
+                    <button class="confirm-btn" onclick="scanProfile()">Scan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $().ready(function () {
+        loadKeywords();
+    });
+
+    function loadKeywords() {
+        $.ajax({
+            url: "/v2/userprofile/keywords",
+            type: "GET",
+            success: function (data) {
+                const keywordPool = document.getElementById('keyword-pool');
+                $(keywordPool).empty();
+
+                Object.entries(data).forEach(([key, value]) => {
+                    const keywordPool = document.getElementById('keyword-pool');
+                    const div = document.createElement('div');
+                    div.className = 'keyword';
+
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = value;
+                    input.className = 'keyword-weight';
+                    input.min = 1;
+                    input.onchange = function() {
+                        updateKeyword(key, input.value);
+                    };
+
+                    const textNode = document.createTextNode(key);
+
+                    const i = document.createElement('i');
+                    i.className = 'fa-solid fa-xmark remove-btn';
+                    i.onclick = function() {
+                        removeKeyword(key);
+                    };
+
+                    div.appendChild(input);
+                    div.appendChild(textNode);
+                    div.appendChild(i);
+                    keywordPool.appendChild(div);
+                });
+            },
+            error: function (xhr, status, error) {
+                alert("Error: " + error.message);
+            }
+        });
+    }
+
+    function addKeywords() {
+        let keywords = document.getElementById("add-keywords").value;
+        let keywordList = keywords.split(",");
+        if (keywordList.length % 2 != 0) {
+            alert("Please input keywords in pairs!!");
+            return;
+        }
+
+        let data = {};
+        for (let i = 0; i < (keywordList.length / 2); i++) {
+            data[keywordList[i * 2].trim()] = keywordList[(i * 2) + 1];
+        }
+
+        $.ajax({
+            url: "/v2/userprofile/keywords",
+            type: "POST",
+            data: {
+                keywords: data
+            },
+            success: function (data) {
+                loadKeywords();
+            },
+            error: function (xhr, status, error) {
+                alert("Error: " + error.message);
+            }
+        });
+
+    }
+
+    function updateKeyword(keyword, weighting) {
+        $.ajax({
+            url: "/v2/userprofile/keyword/" + keyword,
+            type: "PUT",
+            data: {
+                weighting
+            },
+            success: function (data) {
+                loadKeywords();
+            },
+            error: function (xhr, status, error) {
+                alert("Error: " + error.message);
+            }
+        });
+    }
+
+    function removeKeyword(keyword) {
+        let confirmed = confirm(`Are you sure to remove this keyword (${keyword})?`)
+        if (!confirmed) {
+            return;
+        }
+
+        $.ajax({
+            url: "/v2/userprofile/keyword/" + keyword,
+            type: "DELETE",
+            success: function (data) {
+                loadKeywords();
+            },
+            error: function (xhr, status, error) {
+                alert("Error: " + error.message);
+            }
+        });
+    }
+
+    function scanProfile() {
+        var userId = document.getElementById("userId").value;
+        if (userId == "") {
+            alert("Please input your google scholar userId!!");
+            return;
+        }
+
+        $.ajax({
+            url: "/v2/userprofile",
+            type: "PUT",
+            data: {
+                userId
+            },
+            success: function (data) {
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                alert("Error: " + error.message);
+            }
+        });
+
+        alert("Scanning profile, please wait for a while!!");
+    }
+</script>

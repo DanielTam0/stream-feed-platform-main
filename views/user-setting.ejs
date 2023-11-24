@@ -14,17 +14,17 @@
                         <span class="get-scholar-id" id="get-scholar-id">Get my Google Scholar ID</span>
                     </div>
                     <div id="profile" class="profile">
-                        <% if(result){%>
-                            <img src="<%-result[0]%>" class="profile_pic">
-                            <div class="profile_name"><%-result[1]%></div>
+                        <% if(image){%>
+                            <img src="<%-image%>" class="profile_pic">
+                            <div class="profile_name"><%-name%></div>
                         <% }%>
                     </div>
                     <div>
                         <div id="filter-text" class="filter-text row">
-                            <% if(result){%>
+                            <% if(wordScore){%>
                                 <div class="header2">Recommended keywords</div>
-                                <%for(var i = 2; i <result.length; i++){%>
-                                    <div id="result<%-i%>" class="checkboxes display-keyword col-4"><input type="checkbox" id="checkbox<%-i%>"><%-result[i]%></div>
+                                <%for(var i = 2; i <wordScore.length; i++){%>
+                                    <div id="wordScore<%-i%>" class="checkboxes display-keyword col-4"><input type="checkbox" id="checkbox<%-i%>"><%-wordScore[i].keyword%></div>
                                 <%}%>
                             <% }%>
                             <div class="header2">Input customized keywords</div>
@@ -56,9 +56,10 @@
     var keyword = [];
     var checkboxes = [];
     for(var i=0;i<display_keyword.length;i++) {
-        keyword[i] = document.getElementById("result"+ (i + 2));
+        keyword[i] = document.getElementById("wordScore"+ (i + 2));
         checkboxes[i] = document.getElementById("checkbox"+(i + 2));
     }
+
     submit_keyword.onclick = function() {
         var saved_keywords = [];
         var index = 0;

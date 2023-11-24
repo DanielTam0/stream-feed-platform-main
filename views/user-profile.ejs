@@ -39,6 +39,7 @@
     var repeat = false;
     var customized_index = 0;
     var show_remove = document.getElementById("show-remove");
+
     function removeKeyword(remove_keyword){
         for(var i=0;i<remove_key_list.length;i++){
             if(remove_keyword == remove_key_list[i]){
@@ -53,6 +54,7 @@
         }
         repeat=false;
     }
+
     function recoverKeyword(recover_keyword){
         for(var i = 0;i<saved_keywords.length;i++){
 
@@ -67,6 +69,7 @@
             }
         }
     }
+
     function saveChanges(){
         var new_keyword = [];
         var remove_index = [];
@@ -124,6 +127,7 @@
             location.href = "/user-profile";
         }, 200);
     }
+    
     for(var i=0;i<saved_keywords.length;i++){
             var key_weighting = document.getElementById(saved_keywords[i][0]).firstChild;
             key_weighting.addEventListener("change",e=>{

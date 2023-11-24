@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 const sqlite3 = require('sqlite3').verbose();
 const MathJS = require("mathjs");
+const v2 = require("./v2/route");
 // app.use
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(basePath));
 app.use(express.static('public'));
 app.set("view engine", "ejs");
+app.use("/v2", v2.route);
 // include files
 var rssListJS = require("./rss-list.js");
 var rssParser = require('./rss-parser.js');
@@ -34,39 +36,43 @@ var min_total = null;
 const forever = new Date('9999-12-31T23:59:59Z');
 
 // create database file
-let bookmark_db = new sqlite3.Database('./assets/database/bookmark.db',
-sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
-(err) => {
-    bookmark_db.run("CREATE TABLE IF NOT EXISTS bookmark (title TEXT, author TEXT, publish_date DATETIME, publisher TEXT, url TEXT, abstract TEXT)");
-});
+// let bookmark_db = new sqlite3.Database('./assets/database/bookmark.db',
+// sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+// (err) => {
+//     bookmark_db.run("CREATE TABLE IF NOT EXISTS bookmark (title TEXT, author TEXT, publish_date DATETIME, publisher TEXT, url TEXT, abstract TEXT)");
+// });
 
 // get post method
-app.get('/test', (req, res) => {
-    res.render('test');
-})
+// app.get('/test', (req, res) => {
+//     res.render('test');
+// })
 
 //user-setting
-app.get('/user-setting', (req, res) => {
-    if(req.query.user_id) {
-        var temp_result = user.getAuthorProfileData(req.query.user_id).then(result => {
-            return result;
-        })
-        const printKeywords = async() =>{
-            const final_result = await temp_result;
-            res.render("user-setting",{result:final_result});
-          }
-          printKeywords();
-    }else{
-        res.render("user-setting",{result:null});
-    }
-})
-app.post('/user-setting', (req, res) => {
-    var default_weighting = {relative_weight:0.5,impact_weight:0.5};
-    res.clearCookie('saved_keywords');
-    res.cookie('saved_keywords', req.body.saved_keywords,{ expires: forever });
-    res.cookie('weighting',default_weighting,{ expires: forever });
-    res.redirect('/mainpage');
-})
+// app.get('/user-setting', (req, res) => {
+//     if (req.query.user_id) {
+//         if (req.query.user_id == config.Config) {
+//             return
+//         }
+
+//         config.Config = req.query.user_id;
+//         user.getAuthorProfileData(req.query.user_id)
+//             .then(() => {userSetting(res)});
+//     } else {
+//         userSetting(res);
+//     }
+// })
+
+// function userSetting(res) {
+//     res.render("user-setting", {image: config.Config.image, name: config.Config.name, wordScore: config.Config.wordScore})
+// }
+
+// app.post('/user-setting', (req, res) => {
+//     var default_weighting = {relative_weight:0.5,impact_weight:0.5};
+//     res.clearCookie('saved_keywords');
+//     res.cookie('saved_keywords', req.body.saved_keywords,{ expires: forever });
+//     res.cookie('weighting',default_weighting,{ expires: forever });
+//     res.redirect('/mainpage');
+// })
 
 //main page
 app.get('/mainpage', (req, res) => {
@@ -127,14 +133,14 @@ app.get('/mainpage', (req, res) => {
                 }
             }else{
                 for(var i = 0;i<final_result.length;i++){
-                    final_result[i].totalScore = MathJS.sqrt(final_result[i].totalScore);
-                    final_result[i].totalScore = final_result[i].totalScore.toFixed(3);
+                    // final_result[i].totalScore = MathJS.sqrt(final_result[i].totalScore);
+                    // final_result[i].totalScore = final_result[i].totalScore.toFixed(3);
                 }
                 
             }
 
             res.render("mainpage", {org_name:org_name, list_name:list_name, saved_keywords:saved_keywords, final_result:final_result,store_list_no:store_list_no, db_data:db_data});
-          }
+        }
         printJournal();
 }else{
     
@@ -193,34 +199,35 @@ app.post('/mainpage', (req, res) => {
 // })
 
 //user profile
-app.get('/user-profile', (req, res) => {
-    const cookies = req.cookies;
-    //const saved_keywords = cookies['saved_keywords'];
-    const saved_keywords = [["Electro-optic",10],["Optical",8],["Modulation",10],["Quantum",5],["Photonics",8],["Lithium Niobate",8], ["LiNbO3",8], ["Waveguide",8], ["Resonator",8], ["Fabrication",6], ["Microwave photonics",8], ["Nanophotonic",8], ["Plasmonic",3], ["Dispersion",5], ["Second-Harmonic",8], ["Frequency comb",8], ["Nonlinear optic",8], ["Integrated photonics",10], ["Photonic integrated circuits",10]];
-    //Electro-optic,Optical,Modulation,Quantum,Photonics,Lithium,Niobate,LiNbO3,Waveguide,Resonator,Fabrication,Microwave photonics,Nanophotonic,Plasmonic,Dispersion,Second-Harmonic,Frequency comb,Nonlinear optic,Integrated photonics,Photonic,Integrated circuits,Inverse design
-    const user_profile = cookies['profile'];
-    const weighting = cookies['weighting'];
+// app.get('/user-profile', (req, res) => {
+//     const cookies = req.cookies;
+//     //const saved_keywords = cookies['saved_keywords'];
+//     const saved_keywords = [["Electro-optic",10],["Optical",8],["Modulation",10],["Quantum",5],["Photonics",8],["Lithium Niobate",8], ["LiNbO3",8], ["Waveguide",8], ["Resonator",8], ["Fabrication",6], ["Microwave photonics",8], ["Nanophotonic",8], ["Plasmonic",3], ["Dispersion",5], ["Second-Harmonic",8], ["Frequency comb",8], ["Nonlinear optic",8], ["Integrated photonics",10], ["Photonic integrated circuits",10]];
+//     //Electro-optic,Optical,Modulation,Quantum,Photonics,Lithium,Niobate,LiNbO3,Waveguide,Resonator,Fabrication,Microwave photonics,Nanophotonic,Plasmonic,Dispersion,Second-Harmonic,Frequency comb,Nonlinear optic,Integrated photonics,Photonic,Integrated circuits,Inverse design
+//     const user_profile = cookies['profile'];
+//     const weighting = cookies['weighting'];
 
-    function sortByIndex(a,b){
-        if(a[1]==b[1]){
-            return 0;
-        }else{
-            return (a[1]>b[1]) ?-1:1;
-        }
-    }
-    for(var i=0;i<saved_keywords.length;i++){
-        saved_keywords[i].synonyms = thesaurus.printSynonyms(saved_keywords[i][0]);
-    }
-    saved_keywords.sort(sortByIndex);
-    res.render('user-profile',{saved_keywords:saved_keywords,user_profile:user_profile,weighting:weighting});
-})
-app.post('/user-profile', (req, res) => {
-    res.clearCookie('saved_keywords');
-    res.clearCookie('weighting');
-    res.cookie('weighting',req.body.weighting,{ expires: forever });
-    res.cookie('saved_keywords', req.body.saved_keywords,{ expires: forever });
-    res.send('');
-})
+//     function sortByIndex(a,b){
+//         if(a[1]==b[1]){
+//             return 0;
+//         }else{
+//             return (a[1]>b[1]) ?-1:1;
+//         }
+//     }
+//     for(var i=0;i<saved_keywords.length;i++){
+//         saved_keywords[i].synonyms = thesaurus.printSynonyms(saved_keywords[i][0]);
+//     }
+//     saved_keywords.sort(sortByIndex);
+//     res.render('v2/user-profile',{saved_keywords:saved_keywords,user_profile:user_profile,weighting:weighting});
+// })
+
+// app.post('/user-profile', (req, res) => {
+//     res.clearCookie('saved_keywords');
+//     res.clearCookie('weighting');
+//     res.cookie('weighting',req.body.weighting,{ expires: forever });
+//     res.cookie('saved_keywords', req.body.saved_keywords,{ expires: forever });
+//     res.send('');
+// })
 
 //bookmark
 app.get('/bookmark', (req, res) => {
